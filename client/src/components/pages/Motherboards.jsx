@@ -277,9 +277,12 @@ const Motherboard = () => {
                 )}
                 <div>
                   <h4 className="text-lg font-bold mb-1">
-                    {mb.brand_mb_name} {mb.name}
+                    {mb.brand_mb_name} {mb.model_mb_name ? mb.model_mb_name : mb.name}
                   </h4>
-                  {/* Removed detailed information from cards */}
+                  <p className="text-sm text-gray-600">Сокет: <span className="font-medium">{mb.socket_mb_name}</span></p>
+                  <p className="text-sm text-gray-600">Форм-фактор: <span className="font-medium">{mb.form_factor_mb_name}</span></p>
+                  <p className="text-sm text-gray-600">Тип пам'яті: <span className="font-medium">{mb.memory_type_mb_name}</span></p>
+                  
                   <p className="mt-2 font-semibold text-green-600">{mb.price} грн</p>
                 </div>
 
@@ -305,7 +308,7 @@ const Motherboard = () => {
       </div>
 
       {showModal && selectedMotherboard && (
-        <CartModal item={selectedMotherboard} onClose={() => setShowModal(false)} />
+        <CartModal item={{ ...selectedMotherboard, product_type: 'motherboard' }} onClose={() => setShowModal(false)} />
       )}
     </div>
   );

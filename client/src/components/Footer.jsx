@@ -76,7 +76,6 @@ function Footer() {
           <div className="text-center text-xs leading-tight">
             © 2020–2025 <span className="font-bold">ZYNK™</span> | Твоя техніка. Твій стиль. Усі права захищені.
             <br />
-            <span className="opacity-60">designed by Oleksiy Melnyk</span>
           </div>
 
           <div className="flex items-center gap-4">

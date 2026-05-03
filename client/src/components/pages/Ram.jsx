@@ -1,32 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import CartModal from "../CartModal"; // Переконайтеся, що шлях до CartModal правильний
+import CartModal from "../CartModal"; 
 
 const Ram = () => {
-  // Стан для зберігання даних фільтрів RAM
   const [ramBrands, setRamBrands] = useState([]);
   const [ramMemorySizes, setRamMemorySizes] = useState([]);
   const [ramMemoryTypes, setRamMemoryTypes] = useState([]);
   const [ramFrequencies, setRamFrequencies] = useState([]);
 
-  // Стан для зберігання вибраних фільтрів RAM
   const [selectedRamBrandId, setSelectedRamBrandId] = useState(null);
   const [selectedRamMemorySizeIds, setSelectedRamMemorySizeIds] = useState([]);
   const [selectedRamMemoryTypeIds, setSelectedRamMemoryTypeIds] = useState([]);
   const [selectedRamFrequencyIds, setSelectedRamFrequencyIds] = useState([]);
 
-  // Стан для зберігання списку модулів RAM
   const [ramModules, setRamModules] = useState([]);
-  const [sortOrder, setSortOrder] = useState('popular'); // 'popular', 'asc', 'desc'
+  const [sortOrder, setSortOrder] = useState('popular'); 
 
-  // Стан для модального вікна кошика
   const [showModal, setShowModal] = useState(false);
   const [selectedRamModule, setSelectedRamModule] = useState(null);
 
   const navigate = useNavigate();
 
-  // Завантаження даних для фільтрів при першому рендері
   useEffect(() => {
     axios.get('http://localhost:8108/brands_ram')
       .then(res => setRamBrands(res.data))
@@ -43,9 +38,8 @@ const Ram = () => {
     axios.get('http://localhost:8108/frequencies_ram')
       .then(res => setRamFrequencies(res.data))
       .catch(err => console.error("Помилка при завантаженні частот RAM:", err));
-  }, []); // Пустий масив залежностей означає, що ефект запускається один раз після першого рендеру
+  }, []); 
 
-  // Завантаження модулів RAM при зміні фільтрів або сортування
   useEffect(() => {
     const params = {};
     if (selectedRamBrandId) params.brand_ram_id = selectedRamBrandId;
@@ -64,7 +58,6 @@ const Ram = () => {
       .catch(err => console.error("Помилка при завантаженні модулів RAM:", err));
   }, [selectedRamBrandId, selectedRamMemorySizeIds, selectedRamMemoryTypeIds, selectedRamFrequencyIds, sortOrder]);
 
-  // Функції для обробки зміни вибраних фільтрів (чекбокси)
   const handleMemorySizeRamToggle = (sizeId) => {
     setSelectedRamMemorySizeIds(prev =>
       prev.includes(sizeId)
@@ -89,7 +82,6 @@ const Ram = () => {
     );
   };
 
-  // Обробник для кнопки "Додати до кошика"
   const handleAddToCartClick = (ramModule) => {
     setSelectedRamModule(ramModule);
     setShowModal(true);
@@ -97,11 +89,9 @@ const Ram = () => {
 
   return (
     <div className="flex">
-      {/* Фільтри */}
       <div className="w-[250px] p-4 border-r">
         <h2 className="text-2xl font-bold mb-4">Фільтри</h2>
 
-        {/* Фільтр по брендам RAM */}
         <div className="mb-6">
           <h3 className="font-semibold mb-2">Бренди RAM</h3>
           {ramBrands.map(brand => (
@@ -127,7 +117,6 @@ const Ram = () => {
           </button>
         </div>
 
-        {/* Фільтр по обсягу пам'яті RAM */}
         <div className="mb-6">
           <h3 className="font-semibold mb-2">Обсяг пам'яті</h3>
           {ramMemorySizes.map(size => (
@@ -152,7 +141,6 @@ const Ram = () => {
           </button>
         </div>
 
-        {/* Фільтр по типу пам'яті RAM */}
         <div className="mb-6">
           <h3 className="font-semibold mb-2">Тип пам'яті</h3>
           {ramMemoryTypes.map(type => (
@@ -177,7 +165,6 @@ const Ram = () => {
           </button>
         </div>
 
-        {/* Фільтр по частоті RAM */}
         <div className="mb-6">
           <h3 className="font-semibold mb-2">Частота</h3>
           {ramFrequencies.map(frequency => (
@@ -203,7 +190,6 @@ const Ram = () => {
         </div>
       </div>
 
-      {/* Список модулів RAM */}
       <div className="flex-1 p-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Оперативна пам'ять</h2>
@@ -240,14 +226,13 @@ const Ram = () => {
                     src={`http://localhost:8108/images${ram.image_url}`}
                     alt={`${ram.brand_ram_name} ${ram.name}`}
                     className="w-full h-48 object-contain mb-2"
-                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/192x192/E0E0E0/333333?text=No+Image'; }} // Fallback для зображень
+                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/192x192/E0E0E0/333333?text=No+Image'; }} 
                   />
                 )}
                 <div>
                   <h4 className="text-lg font-bold mb-1">
                     {ram.brand_ram_name} {ram.name}
                   </h4>
-                  {/* Додано інформацію про обсяг, тип та частоту */}
                   <p className="text-sm">Обсяг: {ram.memory_size_ram_value}</p>
                   <p className="text-sm">Тип: {ram.memory_type_ram_name}</p>
                   <p className="text-sm">Частота: {ram.frequency_ram_value}</p>

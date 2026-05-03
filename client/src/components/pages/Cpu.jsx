@@ -1,34 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import CartModal from "../CartModal"; // Переконайтеся, що шлях правильний
+import CartModal from "../CartModal"; 
 
-const CPUPage = () => { // Назва компонента змінена на CPUPage для консистентності
-  // Стан для даних фільтрів CPU
+const CPUPage = () => { 
   const [cpuBrands, setCpuBrands] = useState([]);
   const [cpuFamilies, setCpuFamilies] = useState([]);
   const [cpuModels, setCpuModels] = useState([]);
   const [cpuSockets, setCpuSockets] = useState([]);
   const [cpuCores, setCpuCores] = useState([]);
 
-  // Стан для вибраних фільтрів CPU
   const [selectedCpuBrandId, setSelectedCpuBrandId] = useState(null);
   const [selectedCpuFamilyId, setSelectedCpuFamilyId] = useState(null);
   const [selectedCpuModelId, setSelectedCpuModelId] = useState(null);
   const [selectedCpuSocketIds, setSelectedCpuSocketIds] = useState([]);
   const [selectedCpuCoreIds, setSelectedCpuCoreIds] = useState([]);
 
-  // Стан для списку процесорів та сортування
   const [cpus, setCpus] = useState([]);
   const [sortOrder, setSortOrder] = useState('popular');
 
-  // Стан для модального вікна кошика
   const [showModal, setShowModal] = useState(false);
   const [selectedCpu, setSelectedCpu] = useState(null);
 
   const navigate = useNavigate();
 
-  // Ефект для початкового завантаження брендів CPU, сокетів та ядер
   useEffect(() => {
     axios.get('http://localhost:8108/brands_cpu')
       .then(res => setCpuBrands(res.data))
@@ -43,7 +38,6 @@ const CPUPage = () => { // Назва компонента змінена на C
       .catch(err => console.error("Помилка при завантаженні кількості ядер CPU:", err));
   }, []);
 
-  // Ефект для завантаження сімейств CPU на основі вибраного бренду CPU
   useEffect(() => {
     if (selectedCpuBrandId) {
       axios.get(`http://localhost:8108/families_cpu?brand_cpu_id=${selectedCpuBrandId}`)
@@ -55,7 +49,6 @@ const CPUPage = () => { // Назва компонента змінена на C
     }
   }, [selectedCpuBrandId]);
 
-  // Ефект для завантаження моделей CPU на основі вибраного сімейства CPU
   useEffect(() => {
     if (selectedCpuFamilyId) {
       axios.get(`http://localhost:8108/models_cpu?family_cpu_id=${selectedCpuFamilyId}`)
@@ -67,7 +60,6 @@ const CPUPage = () => { // Назва компонента змінена на C
     }
   }, [selectedCpuFamilyId]);
 
-  // Ефект для завантаження списку процесорів на основі всіх фільтрів
   useEffect(() => {
     const params = {};
     if (selectedCpuBrandId) params.brand_cpu_id = selectedCpuBrandId;
@@ -87,7 +79,6 @@ const CPUPage = () => { // Назва компонента змінена на C
       .catch(err => console.error("Помилка при завантаженні процесорів:", err));
   }, [selectedCpuBrandId, selectedCpuFamilyId, selectedCpuModelId, selectedCpuSocketIds, selectedCpuCoreIds, sortOrder]);
 
-  // Обробник перемикання для сокетів CPU
   const handleSocketToggle = (socketId) => {
     setSelectedCpuSocketIds(prev =>
       prev.includes(socketId)
@@ -96,7 +87,6 @@ const CPUPage = () => { // Назва компонента змінена на C
     );
   };
 
-  // Обробник перемикання для кількості ядер CPU
   const handleCoreToggle = (coreId) => {
     setSelectedCpuCoreIds(prev =>
       prev.includes(coreId)
@@ -105,7 +95,6 @@ const CPUPage = () => { // Назва компонента змінена на C
     );
   };
 
-  // Обробник додавання товару (CPU) до кошика
   const handleAddToCartClick = (cpu) => {
     setSelectedCpu(cpu);
     setShowModal(true);
@@ -113,11 +102,9 @@ const CPUPage = () => { // Назва компонента змінена на C
 
   return (
     <div className="flex">
-      {/* Фільтри */}
       <div className="w-[250px] p-4 border-r">
         <h2 className="text-2xl font-bold mb-4">Фільтри</h2>
 
-        {/* Бренди CPU */}
         <div className="mb-6">
           <h3 className="font-semibold mb-2">Бренди CPU</h3>
           {cpuBrands.map(brand => (
@@ -147,7 +134,6 @@ const CPUPage = () => { // Назва компонента змінена на C
           </button>
         </div>
 
-        {/* Сімейства CPU */}
         {cpuFamilies.length > 0 && (
           <div className="mb-6">
             <h3 className="font-semibold mb-2">Сімейство CPU</h3>
@@ -178,7 +164,6 @@ const CPUPage = () => { // Назва компонента змінена на C
           </div>
         )}
 
-        {/* ФІЛЬТР: Моделі CPU */}
         {cpuModels.length > 0 && (
           <div className="mb-6">
             <h3 className="font-semibold mb-2">Модель CPU</h3>
@@ -206,7 +191,6 @@ const CPUPage = () => { // Назва компонента змінена на C
           </div>
         )}
 
-        {/* Сокети CPU */}
         <div className="mb-6">
           <h3 className="font-semibold mb-2">Сокети</h3>
           {cpuSockets.map(socket => (
@@ -231,7 +215,6 @@ const CPUPage = () => { // Назва компонента змінена на C
           </button>
         </div>
 
-        {/* Кількість ядер CPU */}
         <div>
           <h3 className="font-semibold mb-2">Кількість ядер</h3>
           {cpuCores.map(core => (
@@ -257,7 +240,6 @@ const CPUPage = () => { // Назва компонента змінена на C
         </div>
       </div>
 
-      {/* Товари (Процесори) */}
       <div className="flex-1 p-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Процесори</h2>
@@ -294,18 +276,17 @@ const CPUPage = () => { // Назва компонента змінена на C
                     src={`http://localhost:8108/images${cpu.image_url}`}
                     alt={`${cpu.brand_cpu_name} ${cpu.name}`}
                     className="w-full h-48 object-contain mb-2"
-                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/192x192/E0E0E0/333333?text=No+Image'; }} // Fallback для зображень
+                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/192x192/E0E0E0/333333?text=No+Image'; }}
                   />
                 )}
                 <div>
                   <h4 className="text-lg font-bold mb-1">
-                    {cpu.brand_cpu_name} {cpu.name}
+                    {cpu.brand_cpu_name} {cpu.model_cpu_name ? cpu.model_cpu_name : cpu.name}
                   </h4>
-                  {/* Рядки для Моделі, Сімейства, Сокета, Ядер - закоментовані */}
-                  {/* {cpu.model_cpu_name && <p className="text-sm text-gray-600">Модель: {cpu.model_cpu_name}</p>} */}
-                  {/* <p className="text-sm text-gray-600">Сімейство: {cpu.family_cpu_name}</p> */}
-                  {/* <p className="text-sm text-gray-600">Сокет: {cpu.socket_cpu_name}</p> */}
-                  {/* <p className="text-sm text-gray-600">Ядер: {cpu.cores_cpu_number}</p> */}
+                  <p className="text-sm text-gray-600">Сімейство: <span className="font-medium">{cpu.family_cpu_name}</span></p>
+                  <p className="text-sm text-gray-600">Сокет: <span className="font-medium">{cpu.socket_cpu_name}</span></p>
+                  <p className="text-sm text-gray-600">Ядер: <span className="font-medium">{cpu.cores_cpu_number}</span></p>
+                  
                   <p className="mt-2 font-semibold text-green-600">{cpu.price} грн</p>
                 </div>
 
@@ -330,9 +311,8 @@ const CPUPage = () => { // Назва компонента змінена на C
         )}
       </div>
 
-      {/* Модальне вікно */}
       {showModal && selectedCpu && (
-        <CartModal item={selectedCpu} onClose={() => setShowModal(false)} />
+        <CartModal item={{ ...selectedCpu, product_type: 'cpu' }} onClose={() => setShowModal(false)} />
       )}
     </div>
   );

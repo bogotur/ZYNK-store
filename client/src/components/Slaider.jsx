@@ -33,7 +33,6 @@ const slides = [
     oldPrice: '110.000₴',
     newPrice: '95.000₴',
   },
-  // інші слайди
 ];
 
 function Slider() {
@@ -49,19 +48,14 @@ function Slider() {
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-center">
-      {/* Характеристики */}
       <div className="min-h-[280px]">
         <ul className="space-y-1 text-[10px] sm:text-[12px] md:text-sm font-medium">
           {slides[currentIndex].specs.map((line, idx) => (
             <li key={idx}>{line}</li>
           ))}
         </ul>
-        <button className="bg-black text-white px-6 py-2 rounded-full text-sm font-semibold mt-4">
-          Придбати
-        </button>
       </div>
 
-      {/* Фото + ціна */}
       <div className="flex flex-col items-center xl:items-end min-h-[360px]">
         <img
           src={slides[currentIndex].image}
@@ -78,7 +72,6 @@ function Slider() {
         </div>
       </div>
 
-      {/* Індикатори */}
       <div className="col-span-full flex justify-center mt-4 gap-2">
         {slides.map((_, idx) => (
           <span

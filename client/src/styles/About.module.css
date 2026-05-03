@@ -1,0 +1,392 @@
+.page {
+  background: #f5f5f5;
+  color: #050505;
+}
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 56px 20px 32px;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(115, 115, 115, 0.18), transparent 22%),
+    radial-gradient(circle at 15% 0%, rgba(255, 255, 255, 0.85), transparent 28%),
+    linear-gradient(180deg, #f7f7f7 0%, #ececec 100%);
+}
+
+.heroInner,
+.statsGrid,
+.storyGrid,
+.advantagesGrid,
+.ctaBox,
+.sectionHeading {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.heroInner {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.heroContent {
+  padding: 28px 0;
+}
+
+.kicker,
+.sectionKicker,
+.specLabel {
+  display: inline-block;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.kicker,
+.sectionKicker {
+  margin-bottom: 16px;
+  color: #5d5d5d;
+}
+
+.title {
+  margin: 0 0 20px;
+  font-size: clamp(42px, 8vw, 88px);
+  line-height: 0.95;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+}
+
+.subtitle {
+  max-width: 700px;
+  margin: 0 0 28px;
+  font-size: 18px;
+  line-height: 1.7;
+  color: #3c3c3c;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.primaryButton,
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 800;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.primaryButton {
+  background: #050505;
+  color: #ffffff;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
+}
+
+.primaryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 42px rgba(0, 0, 0, 0.18);
+}
+
+.secondaryButton {
+  border: 1px solid #050505;
+  color: #050505;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.secondaryButton:hover {
+  transform: translateY(-2px);
+  background: #ffffff;
+}
+
+.heroCard {
+  position: relative;
+  border-radius: 30px;
+  padding: 28px;
+  min-height: 100%;
+  background: #090909;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+
+.cardGlow {
+  position: absolute;
+  inset: auto -20% -10% auto;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.22), transparent 68%);
+  pointer-events: none;
+}
+
+.specLabel {
+  position: relative;
+  margin-bottom: 18px;
+  color: rgba(255, 255, 255, 0.64);
+}
+
+.specList {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.specList li {
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.specList li:last-child {
+  border-bottom: 0;
+}
+
+.statsSection {
+  padding: 14px 20px 56px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.statCard {
+  padding: 26px 22px;
+  border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid #e9e9e9;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.statValue {
+  margin-bottom: 8px;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1;
+  font-weight: 900;
+}
+
+.statLabel {
+  color: #555555;
+  line-height: 1.5;
+}
+
+.storySection,
+.advantagesSection,
+.ctaSection {
+  padding: 0 20px 72px;
+}
+
+.sectionHeading {
+  margin-bottom: 28px;
+}
+
+.sectionHeading h2 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.05;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.storyGrid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 22px;
+}
+
+.storyText,
+.categoryBox,
+.advantageCard,
+.ctaBox {
+  border-radius: 28px;
+  background: #ffffff;
+  border: 1px solid #e9e9e9;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.05);
+}
+
+.storyText {
+  padding: 30px;
+}
+
+.storyText p {
+  margin: 0 0 18px;
+  color: #3d3d3d;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.storyText p:last-child {
+  margin-bottom: 0;
+}
+
+.categoryBox {
+  padding: 30px;
+  background: linear-gradient(180deg, #111111 0%, #050505 100%);
+  color: #ffffff;
+}
+
+.categoryBox h3 {
+  margin: 0 0 18px;
+  font-size: 26px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.categoryList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.categoryItem {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 700;
+}
+
+.advantagesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.advantageCard {
+  padding: 28px;
+}
+
+.advantageNumber {
+  margin-bottom: 16px;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  color: #7c7c7c;
+  font-weight: 800;
+}
+
+.advantageCard h3 {
+  margin: 0 0 12px;
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+.advantageCard p {
+  margin: 0;
+  color: #4c4c4c;
+  line-height: 1.75;
+}
+
+.ctaBox {
+  max-width: 1240px;
+  padding: 34px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background:
+    radial-gradient(circle at 90% 20%, rgba(0, 0, 0, 0.06), transparent 18%),
+    linear-gradient(180deg, #ffffff 0%, #f4f4f4 100%);
+}
+
+.ctaBox h2 {
+  margin: 0 0 14px;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.05;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.ctaBox p {
+  margin: 0;
+  max-width: 760px;
+  color: #444444;
+  line-height: 1.75;
+}
+
+@media (max-width: 1024px) {
+  .heroInner,
+  .storyGrid,
+  .statsGrid,
+  .advantagesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ctaBox {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding-top: 40px;
+  }
+
+  .heroCard,
+  .storyText,
+  .categoryBox,
+  .advantageCard,
+  .ctaBox,
+  .statCard {
+    border-radius: 22px;
+  }
+
+  .title {
+    font-size: clamp(36px, 14vw, 68px);
+  }
+
+  .subtitle,
+  .storyText p,
+  .advantageCard p,
+  .ctaBox p {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .heroActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+  }
+
+  .storySection,
+  .advantagesSection,
+  .ctaSection,
+  .statsSection {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .hero {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

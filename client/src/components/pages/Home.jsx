@@ -107,7 +107,7 @@ function Home() {
   const reviews = [
     {
       icon: Men, 
-      name: 'Олександр Голяченко',
+      name: 'Олександр Іваненко',
       text: '«Брав у ZYNK монітор і клавіатуру — все супер. Оперативно відповіли, швидко доставили. Якість на рівні, рекомендую всім знайомим!»',
     },
     {
@@ -163,9 +163,6 @@ function Home() {
                     <li key={i}>{line}</li>
                   ))}
                 </ul>
-                <button className="bg-black text-white px-6 py-2 rounded-full text-sm font-bold mt-10">
-                  Придбати
-                </button>
               </div>
 
               <div className="col-span-1 flex flex-col items-center xl:items-end">
