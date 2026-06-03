@@ -1,6 +1,6 @@
 import React from "react";
 
-import Privatbank from '../assets/img/privatbank.png';
+import Privatbank from '../assets/img/Privatbank.png';
 import Mastercard from '../assets/img/mastercard.png';
 import Visa from '../assets/img/visa.png';
 import Locate from '../assets/img/locate.png';
