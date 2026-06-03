@@ -36,7 +36,7 @@ import Official from '../../assets/img/official.png';
 import Connection from '../../assets/img/connection.png';
 import Consultation from '../../assets/img/consultation.png';
 import Checked from '../../assets/img/checked.png';
-import Gamer from '../../assets/img/gamer.png';
+import Gamer from '../../assets/img/Gamer.png';
 import Carriage from '../../assets/img/carriage.png';
 import Price from '../../assets/img/price.png';
 import Upgrade from '../../assets/img/upgrade.png';
