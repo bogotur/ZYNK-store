@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../CartContext';
 
-const API_BASE = 'http://localhost:8108/api/videocards';
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/videocards`;
 
 const Videocards = () => {
   const [brands, setBrands] = useState([]);
@@ -265,7 +265,7 @@ const Videocards = () => {
                   <div className="mb-4 rounded-[22px] bg-[#f6f6f6] p-4 pt-12">
                     {card.image_url ? (
                       <img
-                        src={`http://localhost:8108/images/${encodeURIComponent(
+                        src={`${API_BASE}/images/${encodeURIComponent(
                           String(card.image_url).replace(/^\/+/, '')
                         )}`}
                         alt={`${card.brand_name} ${card.model_name}`}
@@ -273,7 +273,7 @@ const Videocards = () => {
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src =
-                            'https://placehold.co/320x240/EAEAEA/333333?text=No+Image';
+                            `${API_BASE}/images/placeholder.jpg`;
                         }}
                       />
                     ) : (

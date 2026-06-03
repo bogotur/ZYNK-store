@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 const AdminLoginPage = () => {
   const navigate = useNavigate();
 
@@ -12,7 +14,7 @@ const AdminLoginPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [pageStatus, setPageStatus] = useState('');
-  const [loginStage, setLoginStage] = useState('idle'); // idle | success
+  const [loginStage, setLoginStage] = useState('idle'); 
 
   const parseJwt = (token) => {
     try {
@@ -53,7 +55,7 @@ const AdminLoginPage = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8108/login', {
+      const response = await axios.post(`${API_BASE}/login`, {
         email: formData.email,
         password: formData.password,
       });

@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import CartModal from "../CartModal"; 
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 const SSD = () => {
     const [ssdBrands, setSsdBrands] = useState([]);
     const [ssdMemorySizes, setSsdMemorySizes] = useState([]);
@@ -21,15 +23,15 @@ const SSD = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:8108/brands_ssd')
+        axios.get(`${API_BASE}/brands_ssd`)
             .then(res => setSsdBrands(res.data))
             .catch(err => console.error("Помилка при завантаженні брендів SSD:", err));
 
-        axios.get('http://localhost:8108/memory_sizes_ssd')
+        axios.get(`${API_BASE}/memory_sizes_ssd`)
             .then(res => setSsdMemorySizes(res.data))
             .catch(err => console.error("Помилка при завантаженні об'ємів пам'яті SSD:", err));
 
-        axios.get('http://localhost:8108/interfaces_ssd')
+        axios.get(`${API_BASE}/interfaces_ssd`)
             .then(res => setSsdInterfaces(res.data))
             .catch(err => console.error("Помилка при завантаженні інтерфейсів SSD:", err));
     }, []); 
@@ -46,7 +48,7 @@ const SSD = () => {
 
         const query = new URLSearchParams(params).toString(); 
 
-        axios.get(`http://localhost:8108/ssds?${query}`)
+        axios.get(`${API_BASE}/ssds?${query}`)
             .then(res => setSsds(res.data))
             .catch(err => console.error("Помилка при завантаженні SSD:", err));
     }, [selectedSsdBrandId, selectedSsdMemorySizeIds, selectedSsdInterfaceIds, sortOrder]); 
@@ -183,10 +185,10 @@ const SSD = () => {
                             <div key={ssd.id} className="relative border rounded-xl p-4 shadow hover:shadow-md transition flex flex-col justify-between"> 
                                 {ssd.image_url && (
                                     <img
-                                        src={`http://localhost:8108/images${ssd.image_url}`}
+                                        src={`${API_BASE}/images${ssd.image_url}`}
                                         alt={`${ssd.brand_ssd_name} ${ssd.model_name}`}
                                         className="w-full h-48 object-contain mb-2" 
-                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/192x192/E0E0E0/333333?text=SSD+Image'; }} 
+                                        onError={(e) => { e.target.onerror = null; e.target.src = `${API_BASE}/images/placeholder.jpg`; }} 
                                     />
                                 )}
                                 <div>

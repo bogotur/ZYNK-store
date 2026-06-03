@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import CartModal from "../CartModal"; 
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 const Ram = () => {
   const [ramBrands, setRamBrands] = useState([]);
   const [ramMemorySizes, setRamMemorySizes] = useState([]);
@@ -23,19 +25,19 @@ const Ram = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:8108/brands_ram')
+    axios.get(`${API_BASE}/brands_ram`)
       .then(res => setRamBrands(res.data))
       .catch(err => console.error("Помилка при завантаженні брендів RAM:", err));
 
-    axios.get('http://localhost:8108/memory_sizes_ram')
+    axios.get(`${API_BASE}/memory_sizes_ram`)
       .then(res => setRamMemorySizes(res.data))
       .catch(err => console.error("Помилка при завантаженні обсягів пам'яті RAM:", err));
 
-    axios.get('http://localhost:8108/memory_types_ram')
+    axios.get(`${API_BASE}/memory_types_ram`)
       .then(res => setRamMemoryTypes(res.data))
       .catch(err => console.error("Помилка при завантаженні типів пам'яті RAM:", err));
 
-    axios.get('http://localhost:8108/frequencies_ram')
+    axios.get(`${API_BASE}/frequencies_ram`)
       .then(res => setRamFrequencies(res.data))
       .catch(err => console.error("Помилка при завантаженні частот RAM:", err));
   }, []); 
@@ -53,7 +55,7 @@ const Ram = () => {
 
     const query = new URLSearchParams(params).toString();
 
-    axios.get(`http://localhost:8108/ram_modules?${query}`)
+    axios.get(`${API_BASE}/ram_modules?${query}`)
       .then(res => setRamModules(res.data))
       .catch(err => console.error("Помилка при завантаженні модулів RAM:", err));
   }, [selectedRamBrandId, selectedRamMemorySizeIds, selectedRamMemoryTypeIds, selectedRamFrequencyIds, sortOrder]);
@@ -223,10 +225,10 @@ const Ram = () => {
               <div key={ram.id} className="relative border rounded-xl p-4 shadow hover:shadow-md transition flex flex-col justify-between">
                 {ram.image_url && (
                   <img
-                    src={`http://localhost:8108/images${ram.image_url}`}
+                    src={`${API_BASE}/images${ram.image_url}`}
                     alt={`${ram.brand_ram_name} ${ram.name}`}
                     className="w-full h-48 object-contain mb-2"
-                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/192x192/E0E0E0/333333?text=No+Image'; }} 
+                    onError={(e) => { e.target.onerror = null; e.target.src = `${API_BASE}/images/placeholder.jpg`; }} 
                   />
                 )}
                 <div>

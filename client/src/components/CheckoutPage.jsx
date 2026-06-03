@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useCart } from './CartContext';
 
-const API_BASE = 'http://localhost:8108';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const CheckoutPage = () => {
   const location = useLocation();

@@ -21,9 +21,11 @@ const Orders = () => {
       return;
     }
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     const fetchOrders = async () => {
       try {
-        const response = await axios.get('http://localhost:8108/orders/my', {
+        const response = await axios.get(`${API_URL}/orders/my`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from './CartContext';
 
-const API_BASE = 'http://localhost:8108';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const FloatingCart = () => {
   const navigate = useNavigate();

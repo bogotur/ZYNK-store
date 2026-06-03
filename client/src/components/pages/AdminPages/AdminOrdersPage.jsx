@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 const AdminOrdersPage = () => {
   const navigate = useNavigate();
 
@@ -49,7 +51,7 @@ const AdminOrdersPage = () => {
     }
 
     try {
-      const response = await axios.get('http://localhost:8108/admin/orders', {
+      const response = await axios.get(`${API_BASE}/admin/orders`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -78,7 +80,7 @@ const AdminOrdersPage = () => {
 
     try {
       const response = await axios.patch(
-        `http://localhost:8108/admin/orders/${orderId}/status`,
+        `${API_BASE}/admin/orders/${orderId}/status`,
         { status },
         {
           headers: {

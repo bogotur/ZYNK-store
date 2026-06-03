@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 const AdminUsersPage = () => {
   const navigate = useNavigate();
 
@@ -57,7 +59,7 @@ const AdminUsersPage = () => {
     }
 
     try {
-      const response = await axios.get('http://localhost:8108/admin/users', {
+      const response = await axios.get(`${API_BASE}/admin/users`, {
         headers: authHeaders(),
       });
 
@@ -139,7 +141,7 @@ const AdminUsersPage = () => {
       setLoadingOrdersId(userId);
 
       const response = await axios.get(
-        `http://localhost:8108/admin/users/${userId}/orders`,
+        `${API_BASE}/admin/users/${userId}/orders`,
         { headers: authHeaders() }
       );
 
@@ -175,7 +177,7 @@ const AdminUsersPage = () => {
       setActionUserId(userId);
 
       const response = await axios.patch(
-        `http://localhost:8108/admin/users/${userId}/make-admin`,
+        `${API_BASE}/admin/users/${userId}/make-admin`,
         {},
         { headers: authHeaders() }
       );
@@ -202,7 +204,7 @@ const AdminUsersPage = () => {
     try {
       setActionUserId(userId);
 
-      await axios.delete(`http://localhost:8108/admin/users/${userId}`, {
+      await axios.delete(`${API_BASE}/admin/users/${userId}`, {
         headers: authHeaders(),
       });
 

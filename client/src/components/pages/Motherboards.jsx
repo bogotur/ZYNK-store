@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import CartModal from "../CartModal"; 
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 const Motherboard = () => {
   const [mbBrands, setMbBrands] = useState([]);
   const [mbModels, setMbModels] = useState([]); 
@@ -25,26 +27,26 @@ const Motherboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:8108/brands_mb')
+    axios.get(`${API_BASE}/brands_mb`)
       .then(res => setMbBrands(res.data))
       .catch(err => console.error("Помилка при завантаженні брендів MB:", err));
 
-    axios.get('http://localhost:8108/sockets_mb')
+    axios.get(`${API_BASE}/sockets_mb`)
       .then(res => setMbSockets(res.data))
       .catch(err => console.error("Помилка при завантаженні сокетів MB:", err));
 
-    axios.get('http://localhost:8108/form_factors_mb')
+    axios.get(`${API_BASE}/form_factors_mb`)
       .then(res => setMbFormFactors(res.data))
       .catch(err => console.error("Помилка при завантаженні форм-факторів MB:", err));
 
-    axios.get('http://localhost:8108/memory_types_mb')
+    axios.get(`${API_BASE}/memory_types_mb`)
       .then(res => setMbMemoryTypes(res.data))
       .catch(err => console.error("Помилка при завантаженні типів пам'яті MB:", err));
   }, []);
 
   useEffect(() => {
     if (selectedMbBrandId) {
-      axios.get(`http://localhost:8108/models_mb?brand_mb_id=${selectedMbBrandId}`)
+      axios.get(`${API_BASE}/models_mb?brand_mb_id=${selectedMbBrandId}`)
         .then(res => setMbModels(res.data))
         .catch(err => console.error("Помилка при завантаженні моделей MB:", err));
     } else {
@@ -67,7 +69,7 @@ const Motherboard = () => {
 
     const query = new URLSearchParams(params).toString();
 
-    axios.get(`http://localhost:8108/motherboards?${query}`)
+    axios.get(`${API_BASE}/motherboards?${query}`)
       .then(res => setMotherboards(res.data))
       .catch(err => console.error("Помилка при завантаженні материнських плат:", err));
   }, [selectedMbBrandId, selectedMbModelId, selectedMbSocketIds, selectedMbFormFactorIds, selectedMbMemoryTypeIds, sortOrder]);
@@ -269,10 +271,10 @@ const Motherboard = () => {
               <div key={mb.id} className="relative border rounded-xl p-4 shadow hover:shadow-md transition flex flex-col justify-between">
                 {mb.image_url && (
                   <img
-                    src={`http://localhost:8108/images${mb.image_url}`}
+                    src={`${API_BASE}/images${mb.image_url}`}
                     alt={`${mb.brand_mb_name} ${mb.name}`}
                     className="w-full h-48 object-contain mb-2"
-                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/192x192/E0E0E0/333333?text=No+Image'; }} // Fallback для зображень
+                    onError={(e) => { e.target.onerror = null; e.target.src = `${API_BASE}/images/placeholder.jpg`; }} 
                   />
                 )}
                 <div>

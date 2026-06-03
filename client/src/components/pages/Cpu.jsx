@@ -24,23 +24,25 @@ const CPUPage = () => {
 
   const navigate = useNavigate();
 
+  const API_BASE = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
-    axios.get('http://localhost:8108/brands_cpu')
+    axios.get(`${API_BASE}/brands_cpu`)
       .then(res => setCpuBrands(res.data))
       .catch(err => console.error("Помилка при завантаженні брендів CPU:", err));
 
-    axios.get('http://localhost:8108/sockets_cpu')
+    axios.get(`${API_BASE}/sockets_cpu`)
       .then(res => setCpuSockets(res.data))
       .catch(err => console.error("Помилка при завантаженні сокетів CPU:", err));
 
-    axios.get('http://localhost:8108/cores_cpu')
+    axios.get(`${API_BASE}/cores_cpu`)
       .then(res => setCpuCores(res.data))
       .catch(err => console.error("Помилка при завантаженні кількості ядер CPU:", err));
   }, []);
 
   useEffect(() => {
     if (selectedCpuBrandId) {
-      axios.get(`http://localhost:8108/families_cpu?brand_cpu_id=${selectedCpuBrandId}`)
+      axios.get(`${API_BASE}/families_cpu?brand_cpu_id=${selectedCpuBrandId}`)
         .then(res => setCpuFamilies(res.data))
         .catch(err => console.error("Помилка при завантаженні сімейств CPU:", err));
     } else {
@@ -51,7 +53,7 @@ const CPUPage = () => {
 
   useEffect(() => {
     if (selectedCpuFamilyId) {
-      axios.get(`http://localhost:8108/models_cpu?family_cpu_id=${selectedCpuFamilyId}`)
+      axios.get(`${API_BASE}/models_cpu?family_cpu_id=${selectedCpuFamilyId}`)
         .then(res => setCpuModels(res.data))
         .catch(err => console.error("Помилка при завантаженні моделей CPU:", err));
     } else {
@@ -74,7 +76,7 @@ const CPUPage = () => {
 
     const query = new URLSearchParams(params).toString();
 
-    axios.get(`http://localhost:8108/cpus?${query}`)
+    axios.get(`${API_BASE}/cpus?${query}`)
       .then(res => setCpus(res.data))
       .catch(err => console.error("Помилка при завантаженні процесорів:", err));
   }, [selectedCpuBrandId, selectedCpuFamilyId, selectedCpuModelId, selectedCpuSocketIds, selectedCpuCoreIds, sortOrder]);
@@ -273,7 +275,7 @@ const CPUPage = () => {
               <div key={cpu.id} className="relative border rounded-xl p-4 shadow hover:shadow-md transition flex flex-col justify-between">
                 {cpu.image_url && (
                   <img
-                    src={`http://localhost:8108/images${cpu.image_url}`}
+                    src={`${API_BASE}/images${cpu.image_url}`}
                     alt={`${cpu.brand_cpu_name} ${cpu.name}`}
                     className="w-full h-48 object-contain mb-2"
                     onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/192x192/E0E0E0/333333?text=No+Image'; }}

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../../styles/AuthPage.module.css';
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 const NAME_REGEX = /^[A-Za-zА-Яа-яІіЇїЄєҐґ' -]{2,30}$/;
 const PHONE_ALLOWED_REGEX = /^\+?[0-9\s\-()]+$/;
 const CITY_REGEX = /^[A-Za-zА-Яа-яІіЇїЄєҐґ' -]{2,120}$/;
@@ -251,7 +253,7 @@ export default function AuthPage() {
     }
 
     try {
-      const res = await fetch('http://localhost:8108/login', {
+      const res = await fetch(`${API_BASE}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cleanedLoginForm)
@@ -339,7 +341,7 @@ export default function AuthPage() {
     }
 
     try {
-      const res = await fetch('http://localhost:8108/register', {
+      const res = await fetch(`${API_BASE}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cleanedForm)

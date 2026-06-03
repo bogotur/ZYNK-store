@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 const CartModal = ({ item, onClose }) => {
   const [quantity, setQuantity] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -106,7 +108,7 @@ const CartModal = ({ item, onClose }) => {
   };
 
   const imageSrc = item.image_url
-    ? `http://localhost:8108/images/${encodeURIComponent(
+    ? `${API_BASE}/images/${encodeURIComponent(
         String(item.image_url).replace(/^\/+/, '')
       )}`
     : null;
@@ -146,7 +148,7 @@ const CartModal = ({ item, onClose }) => {
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src =
-                      'https://placehold.co/260x260/EAEAEA/333333?text=No+Image';
+                      `${API_BASE}/images/placeholder.jpg`;
                   }}
                 />
               ) : (
