@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../CartContext';
 
-const API_BASE = `${import.meta.env.VITE_API_URL}/api/videocards`;
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const Videocards = () => {
   const [brands, setBrands] = useState([]);
@@ -22,12 +22,12 @@ const Videocards = () => {
 
   useEffect(() => {
     axios
-      .get(`${API_BASE}/brands`)
+      .get(`${API_BASE}/api/videocards/brands`)
       .then((res) => setBrands(res.data))
       .catch((err) => console.log(err));
 
     axios
-      .get(`${API_BASE}/vendors`)
+      .get(`${API_BASE}/api/videocards/vendors`)
       .then((res) => setVendors(res.data))
       .catch((err) => console.log(err));
   }, []);
@@ -35,7 +35,7 @@ const Videocards = () => {
   useEffect(() => {
     if (selectedBrandId) {
       axios
-        .get(`${API_BASE}/models?brand_id=${selectedBrandId}`)
+        .get(`${API_BASE}/api/videocards/models?brand_id=${selectedBrandId}`)
         .then((res) => setModels(res.data))
         .catch((err) => console.log(err));
     } else {
@@ -57,7 +57,7 @@ const Videocards = () => {
     const query = new URLSearchParams(params).toString();
 
     axios
-      .get(`${API_BASE}/cards?${query}`)
+      .get(`${API_BASE}/api/videocards/cards?${query}`)
       .then((res) => setCards(res.data))
       .catch((err) => console.log(err));
   }, [selectedBrandId, selectedModelId, selectedVendorIds, sortOrder]);
@@ -265,9 +265,7 @@ const Videocards = () => {
                   <div className="mb-4 rounded-[22px] bg-[#f6f6f6] p-4 pt-12">
                     {card.image_url ? (
                       <img
-                        src={`${API_BASE}/images/${encodeURIComponent(
-                          String(card.image_url).replace(/^\/+/, '')
-                        )}`}
+                        src={`${API_BASE}/images/${encodeURIComponent(card.image_url)}`}
                         alt={`${card.brand_name} ${card.model_name}`}
                         className="h-56 w-full object-contain transition duration-300 group-hover:scale-[1.03]"
                         onError={(e) => {
