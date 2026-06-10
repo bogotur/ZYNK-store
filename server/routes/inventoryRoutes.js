@@ -28,7 +28,7 @@ const upload = multer({ storage });
 router.get('/admin/inventory', getInventoryItems);
 router.get('/admin/inventory/meta', getInventoryMeta);
 router.get('/admin/inventory/models', getModelsByBrand);
-router.post('/models', createModel);
+router.post('/admin/inventory/models', createModel);
 
 router.post('/admin/inventory/upload-image', upload.single('image'), uploadInventoryImage);
 router.post('/admin/inventory', createInventoryItem);
