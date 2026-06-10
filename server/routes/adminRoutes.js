@@ -7,6 +7,7 @@ const isAdmin = require('../middleware/isAdmin');
 const {
   getAllOrders,
   updateOrderStatus,
+  deleteOrder,
   getAllUsers,
   getUserOrders,
   makeUserAdmin,
@@ -19,6 +20,7 @@ router.patch('/admin/orders/:id/status', authenticateToken, isAdmin, updateOrder
 router.get('/admin/users', authenticateToken, isAdmin, getAllUsers);
 router.get('/admin/users/:id/orders', authenticateToken, isAdmin, getUserOrders);
 router.patch('/admin/users/:id/make-admin', authenticateToken, isAdmin, makeUserAdmin);
+router.delete('/admin/orders/:id', authenticateToken, isAdmin, deleteOrder);
 router.delete('/admin/users/:id', authenticateToken, isAdmin, deleteUser);
 
 module.exports = router;

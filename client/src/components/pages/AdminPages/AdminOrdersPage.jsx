@@ -12,6 +12,7 @@ const AdminOrdersPage = () => {
   const [pageStatus, setPageStatus] = useState('');
   const [activeStatus, setActiveStatus] = useState('all');
   const [updatingId, setUpdatingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   const getToken = () => sessionStorage.getItem('adminToken');
 
@@ -104,6 +105,35 @@ const AdminOrdersPage = () => {
       }
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const deleteOrder = async (orderId) => {
+    const confirmed = window.confirm(
+      `Видалити замовлення #${orderId}? Цю дію не можна буде скасувати.`
+    );
+
+    if (!confirmed) return;
+
+    const token = getToken();
+    setDeletingId(orderId);
+
+    try {
+      await axios.delete(`${API_BASE}/admin/orders/${orderId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setOrders((prev) => prev.filter((order) => order.id !== orderId));
+    } catch (error) {
+      if (error.response?.data?.message) {
+        alert(error.response.data.message);
+      } else {
+        alert('Не вдалося видалити замовлення.');
+      }
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -525,6 +555,15 @@ const AdminOrdersPage = () => {
                             Holder: {order.card_holder || '—'}
                           </p>
                         </div>
+
+                        <button
+                          type="button"
+                          onClick={() => deleteOrder(order.id)}
+                          disabled={deletingId === order.id || updatingId === order.id}
+                          className="w-full rounded-full border border-red-400/40 bg-red-500/10 px-5 py-3.5 text-sm font-bold text-red-200 transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {deletingId === order.id ? 'Видалення...' : 'Видалити замовлення'}
+                        </button>
                       </div>
                     </div>
                   </div>

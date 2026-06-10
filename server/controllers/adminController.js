@@ -170,11 +170,41 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const deleteOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const orderCheck = await pool.query(
+      'SELECT id FROM orders WHERE id = $1',
+      [id]
+    );
+
+    if (orderCheck.rows.length === 0) {
+      return res.status(404).json({
+        message: 'Замовлення не знайдено',
+      });
+    }
+
+    await pool.query('DELETE FROM order_items WHERE order_id = $1', [id]);
+    await pool.query('DELETE FROM orders WHERE id = $1', [id]);
+
+    return res.json({
+      message: 'Замовлення успішно видалено',
+    });
+  } catch (error) {
+    console.error('deleteOrder error:', error);
+    return res.status(500).json({
+      message: 'Помилка сервера при видаленні замовлення',
+    });
+  }
+};
+
 module.exports = {
   getAllOrders,
   updateOrderStatus,
   getAllUsers,
   getUserOrders,
   makeUserAdmin,
+  deleteOrder,
   deleteUser,
 };
