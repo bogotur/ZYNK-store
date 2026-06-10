@@ -4,6 +4,20 @@ import { useNavigate } from 'react-router-dom';
 const API_BASE = import.meta.env.VITE_API_URL;
 
 const CartModal = ({ item, onClose }) => {
+  const getStockQuantity = (product) => {
+    const stock = Number(
+      product?.stock_quantity ??
+        product?.quantity_in_stock ??
+        product?.stock ??
+        product?.available_quantity ??
+        0
+    );
+
+    return Number.isFinite(stock) ? Math.max(0, stock) : 0;
+  };
+
+  const maxStock = getStockQuantity(item);
+
   const [quantity, setQuantity] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
 
@@ -15,13 +29,22 @@ const CartModal = ({ item, onClose }) => {
     }
   }, [quantity, item]);
 
+  useEffect(() => {
+    if (item) {
+      setQuantity((prevQuantity) => Math.max(1, Math.min(prevQuantity, maxStock || 1)));
+    }
+  }, [item, maxStock]);
+
   if (!item) {
     console.warn('CartModal: item is null or undefined, not rendering modal.');
     return null;
   }
 
   const handleQuantityChange = (amount) => {
-    setQuantity((prevQuantity) => Math.max(1, prevQuantity + amount));
+    setQuantity((prevQuantity) => {
+      const nextQuantity = prevQuantity + amount;
+      return Math.max(1, Math.min(nextQuantity, maxStock || 1));
+    });
   };
 
   const formatPrice = (price) => {
@@ -77,6 +100,17 @@ const CartModal = ({ item, onClose }) => {
   }
 
   const handleCheckoutClick = () => {
+    if (maxStock <= 0) {
+      alert('Цього товару немає в наявності.');
+      return;
+    }
+
+    if (quantity > maxStock) {
+      alert(`На складі доступно лише ${maxStock} шт.`);
+      setQuantity(maxStock);
+      return;
+    }
+
     onClose();
     navigate('/checkout', {
       state: {
@@ -85,6 +119,7 @@ const CartModal = ({ item, onClose }) => {
           name: productName,
           price: item.price,
           image_url: item.image_url,
+          stock_quantity: maxStock,
           type: isCpu
             ? 'cpu'
             : isVideocard
@@ -112,6 +147,8 @@ const CartModal = ({ item, onClose }) => {
         String(item.image_url).replace(/^\/+/, '')
       )}`
     : null;
+
+  const isOutOfStock = maxStock <= 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.62)] p-4 backdrop-blur-[2px]">
@@ -147,8 +184,7 @@ const CartModal = ({ item, onClose }) => {
                   className="h-full w-full object-contain"
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src =
-                      `${API_BASE}/images/placeholder.jpg`;
+                    e.target.src = `${API_BASE}/images/placeholder.jpg`;
                   }}
                 />
               ) : (
@@ -176,6 +212,9 @@ const CartModal = ({ item, onClose }) => {
                     Код: {item.product_code}
                   </p>
                 )}
+                <p className={`mt-3 text-sm font-bold ${isOutOfStock ? 'text-red-600' : 'text-green-700'}`}>
+                  {isOutOfStock ? 'Немає в наявності' : `На складі: ${maxStock} шт.`}
+                </p>
               </div>
 
               <div className="rounded-[18px] bg-[#f6f6f6] px-4 py-3 text-right">
@@ -198,16 +237,18 @@ const CartModal = ({ item, onClose }) => {
                 <div className="inline-flex items-center overflow-hidden rounded-full border border-black/10 bg-white">
                   <button
                     onClick={() => handleQuantityChange(-1)}
-                    className="flex h-11 w-11 items-center justify-center text-lg font-bold text-black transition hover:bg-black hover:text-white"
+                    disabled={quantity <= 1 || isOutOfStock}
+                    className="flex h-11 w-11 items-center justify-center text-lg font-bold text-black transition hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-black"
                   >
                     −
                   </button>
                   <span className="min-w-[56px] text-center text-base font-bold text-black">
-                    {quantity}
+                    {isOutOfStock ? 0 : quantity}
                   </span>
                   <button
                     onClick={() => handleQuantityChange(1)}
-                    className="flex h-11 w-11 items-center justify-center text-lg font-bold text-black transition hover:bg-black hover:text-white"
+                    disabled={quantity >= maxStock || isOutOfStock}
+                    className="flex h-11 w-11 items-center justify-center text-lg font-bold text-black transition hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-black"
                   >
                     +
                   </button>
@@ -219,7 +260,7 @@ const CartModal = ({ item, onClose }) => {
                   Разом
                 </p>
                 <p className="text-3xl font-black leading-none text-black">
-                  {formatPrice(totalPrice)} ₴
+                  {formatPrice(isOutOfStock ? 0 : totalPrice)} ₴
                 </p>
               </div>
             </div>
@@ -233,9 +274,10 @@ const CartModal = ({ item, onClose }) => {
               </button>
               <button
                 onClick={handleCheckoutClick}
-                className="flex-1 rounded-full bg-black px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[#1b1b1b]"
+                disabled={isOutOfStock}
+                className="flex-1 rounded-full bg-black px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[#1b1b1b] disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Зробити замовлення
+                {isOutOfStock ? 'Немає в наявності' : 'Зробити замовлення'}
               </button>
             </div>
           </div>

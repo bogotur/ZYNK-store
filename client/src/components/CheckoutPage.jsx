@@ -5,6 +5,19 @@ import { useCart } from './CartContext';
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
+const getStockQuantity = (item) => {
+  const stock = Number(
+    item?.stock_quantity ??
+      item?.quantity_in_stock ??
+      item?.stock ??
+      item?.available_quantity ??
+      0
+  );
+
+  return Number.isFinite(stock) ? Math.max(0, stock) : 0;
+};
+
+
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -222,6 +235,27 @@ const CheckoutPage = () => {
       return;
     }
 
+    const stockErrorItem = orderItems.find((orderItem) => {
+      const stockQuantity = getStockQuantity(orderItem);
+      return stockQuantity > 0 && Number(orderItem.quantity || 1) > stockQuantity;
+    });
+
+    if (stockErrorItem) {
+      setOrderStatus(
+        `Помилка: товар "${stockErrorItem.name}" доступний лише в кількості ${getStockQuantity(stockErrorItem)} шт.`
+      );
+      setLoading(false);
+      return;
+    }
+
+    const outOfStockItem = orderItems.find((orderItem) => getStockQuantity(orderItem) <= 0);
+
+    if (outOfStockItem) {
+      setOrderStatus(`Помилка: товар "${outOfStockItem.name}" немає в наявності.`);
+      setLoading(false);
+      return;
+    }
+
     const cardError = validateCardFields();
     if (cardError) {
       setOrderStatus(`Помилка: ${cardError}`);
@@ -250,6 +284,7 @@ const CheckoutPage = () => {
             product_price: orderItem.price,
             quantity: orderItem.quantity,
             total_amount: orderItem.totalPrice,
+            stock_quantity: getStockQuantity(orderItem),
           })),
           total_amount: totalPrice,
           customer_name: formData.customerName,
@@ -447,6 +482,11 @@ const CheckoutPage = () => {
                           </h3>
                           <p className="mt-3 text-sm leading-6 text-black/60">
                             Кількість: {orderItem.quantity} шт.
+                          </p>
+                          <p className={`mt-2 text-sm font-bold ${getStockQuantity(orderItem) <= 0 ? 'text-red-600' : 'text-green-700'}`}>
+                            {getStockQuantity(orderItem) <= 0
+                              ? 'Немає в наявності'
+                              : `На складі: ${getStockQuantity(orderItem)} шт.`}
                           </p>
 
                           {detailItems.length > 0 && (
@@ -800,7 +840,15 @@ const CheckoutPage = () => {
               <button
                 type="submit"
                 className="w-full rounded-full bg-black px-6 py-4 text-sm font-bold uppercase tracking-[0.12em] text-white transition hover:bg-[#1b1b1b] disabled:opacity-50"
-                disabled={loading || paymentStage !== 'idle'}
+                disabled={
+                  loading ||
+                  paymentStage !== 'idle' ||
+                  orderItems.some(
+                    (orderItem) =>
+                      getStockQuantity(orderItem) <= 0 ||
+                      Number(orderItem.quantity || 1) > getStockQuantity(orderItem)
+                  )
+                }
               >
                 {loading
                   ? formData.paymentMethod === 'card'

@@ -4,17 +4,34 @@ const CartContext = createContext(null);
 
 const CART_STORAGE_KEY = 'zynk_cart';
 
+const getStockQuantity = (item) => {
+  const stock = Number(
+    item?.stock_quantity ??
+      item?.quantity_in_stock ??
+      item?.stock ??
+      item?.available_quantity ??
+      0
+  );
+
+  return Number.isFinite(stock) ? Math.max(0, stock) : 0;
+};
+
 const normalizeCartItem = (item) => {
+  const stockQuantity = getStockQuantity(item);
+
   return {
     id: item.id,
-    product_type: item.product_type || 'product',
+    product_type: item.product_type || item.type || 'product',
     brand_name: item.brand_name || '',
     model_name: item.model_name || item.name || '',
     vendor_name: item.vendor_name || '',
     image_url: item.image_url || '',
     price: Number(item.price || 0),
-    stock_quantity: Number(item.stock_quantity || 0),
-    quantity: Number(item.quantity || 1),
+    stock_quantity: stockQuantity,
+    quantity: Math.max(
+      1,
+      Math.min(Number(item.quantity || 1), stockQuantity || 1)
+    ),
     memory_capacity: item.memory_capacity || '',
     memory_type: item.memory_type || '',
     interface_type: item.interface_type || '',
@@ -43,6 +60,11 @@ export const CartProvider = ({ children }) => {
 
     if (!nextItem.id) return;
 
+    if (nextItem.stock_quantity <= 0) {
+      alert('Цього товару немає в наявності.');
+      return;
+    }
+
     setCartItems((prev) => {
       const existingItem = prev.find(
         (cartItem) =>
@@ -56,11 +78,23 @@ export const CartProvider = ({ children }) => {
             cartItem.id === nextItem.id &&
             cartItem.product_type === nextItem.product_type
           ) {
-            const maxQuantity = Number(cartItem.stock_quantity || 99);
-            const nextQuantity = Math.min(cartItem.quantity + 1, maxQuantity || cartItem.quantity + 1);
+            const maxQuantity = getStockQuantity({
+              ...cartItem,
+              stock_quantity: nextItem.stock_quantity || cartItem.stock_quantity,
+            });
+
+            const nextQuantity = Math.min(
+              Number(cartItem.quantity || 1) + 1,
+              maxQuantity
+            );
+
+            if (Number(cartItem.quantity || 1) >= maxQuantity) {
+              alert(`На складі доступно лише ${maxQuantity} шт.`);
+            }
 
             return {
               ...cartItem,
+              stock_quantity: maxQuantity,
               quantity: nextQuantity,
             };
           }
@@ -87,8 +121,17 @@ export const CartProvider = ({ children }) => {
     setCartItems((prev) =>
       prev.map((item) => {
         if (item.id === id && item.product_type === productType) {
-          const maxQuantity = Number(item.stock_quantity || 99);
-          const safeQuantity = Math.max(1, Math.min(Number(quantity), maxQuantity || Number(quantity)));
+          const maxQuantity = getStockQuantity(item);
+          const requestedQuantity = Number(quantity || 1);
+
+          const safeQuantity = Math.max(
+            1,
+            Math.min(requestedQuantity, maxQuantity || 1)
+          );
+
+          if (requestedQuantity > maxQuantity && maxQuantity > 0) {
+            alert(`На складі доступно лише ${maxQuantity} шт.`);
+          }
 
           return {
             ...item,
