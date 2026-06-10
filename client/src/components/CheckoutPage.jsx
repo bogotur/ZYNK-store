@@ -242,7 +242,13 @@ const CheckoutPage = () => {
 
     if (stockErrorItem) {
       setOrderStatus(
-        `Помилка: товар "${stockErrorItem.name}" доступний лише в кількості ${getStockQuantity(stockErrorItem)} шт.`
+        `❌ Недостатньо товару на складі
+
+${stockErrorItem.name}
+
+Доступно лише: ${getStockQuantity(stockErrorItem)} шт.
+
+Будь ласка, зменште кількість товару та повторіть замовлення.`
       );
       setLoading(false);
       return;
@@ -251,7 +257,14 @@ const CheckoutPage = () => {
     const outOfStockItem = orderItems.find((orderItem) => getStockQuantity(orderItem) <= 0);
 
     if (outOfStockItem) {
-      setOrderStatus(`Помилка: товар "${outOfStockItem.name}" немає в наявності.`);
+      setOrderStatus(
+        `❌ Товар тимчасово відсутній
+
+${outOfStockItem.name}
+
+На жаль, цього товару більше немає на складі.
+Можливо його вже придбав інший покупець.`
+      );
       setLoading(false);
       return;
     }
@@ -337,7 +350,7 @@ const CheckoutPage = () => {
         error.response.data &&
         error.response.data.message
       ) {
-        setOrderStatus(`Помилка: ${error.response.data.message}`);
+        setOrderStatus(error.response.data.message);
       } else {
         setOrderStatus('Помилка сервера при оформленні замовлення.');
       }
@@ -859,8 +872,9 @@ const CheckoutPage = () => {
 
               {orderStatus && paymentStage === 'idle' && (
                 <p
-                  className={`mt-5 rounded-[18px] px-4 py-4 text-center text-sm font-semibold ${
+                  className={`mt-5 whitespace-pre-line rounded-[18px] px-4 py-4 text-center text-sm font-semibold ${
                     orderStatus.includes('Помилка') ||
+                    orderStatus.includes('❌') ||
                     orderStatus.includes('потрібно увійти') ||
                     orderStatus.includes('Сесія закінчилась')
                       ? 'bg-red-50 text-red-600'

@@ -1,6 +1,8 @@
 const pool = require('../db');
 
 const placeOrder = async (req, res) => {
+  const client = await pool.connect();
+
   try {
     const {
       product_id,
@@ -34,7 +36,64 @@ const placeOrder = async (req, res) => {
       return res.status(400).json({ message: 'Заповніть усі обов’язкові поля' });
     }
 
-    const result = await pool.query(
+    if (!['cash_on_delivery', 'card'].includes(payment_method)) {
+      return res.status(400).json({ message: 'Некоректний спосіб оплати' });
+    }
+
+    await client.query('BEGIN');
+
+    if (product_type === 'videocard') {
+      const stockResult = await client.query(
+        `
+        SELECT stock_quantity
+        FROM videocards
+        WHERE id = $1
+        FOR UPDATE
+        `,
+        [product_id]
+      );
+
+      if (stockResult.rows.length === 0) {
+        throw new Error(`❌ Товар "${product_name}" не знайдено.`);
+      }
+
+      const stockQuantity = Number(stockResult.rows[0].stock_quantity || 0);
+
+      if (stockQuantity <= 0) {
+        throw new Error(
+          `❌ Товар тимчасово відсутній
+
+${product_name}
+
+На жаль, цього товару більше немає на складі.
+Можливо його вже придбав інший покупець.`
+        );
+      }
+
+      if (Number(quantity) > stockQuantity) {
+        throw new Error(
+          `❌ Недостатньо товару на складі
+
+${product_name}
+
+Доступно лише: ${stockQuantity} шт.
+
+Будь ласка, зменште кількість товару та повторіть замовлення.`
+        );
+      }
+
+      await client.query(
+        `
+        UPDATE videocards
+        SET stock_quantity = stock_quantity - $1,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = $2
+        `,
+        [quantity, product_id]
+      );
+    }
+
+    const result = await client.query(
       `INSERT INTO orders (
         user_id, product_id, product_name, product_type, product_price,
         quantity, total_amount, customer_name, customer_email, customer_phone,
@@ -55,19 +114,27 @@ const placeOrder = async (req, res) => {
         customer_phone.trim(),
         delivery_address.trim(),
         payment_method,
-        payment_method === 'card' ? String(card_last4).trim() : null,
+        payment_method === 'card' ? String(card_last4 || '').trim() : null,
         payment_method === 'card' ? card_holder?.trim() || null : null,
         payment_method === 'card' ? 'paid' : 'pending',
       ]
     );
+
+    await client.query('COMMIT');
 
     return res.status(201).json({
       message: 'Замовлення успішно створено',
       order: result.rows[0],
     });
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('placeOrder error:', error);
-    return res.status(500).json({ message: 'Помилка сервера при створенні замовлення' });
+
+    return res.status(400).json({
+      message: error.message || 'Помилка сервера при створенні замовлення',
+    });
+  } finally {
+    client.release();
   }
 };
 
@@ -114,6 +181,49 @@ const placeOrderMulti = async (req, res) => {
 
     await client.query('BEGIN');
 
+    for (const item of items) {
+      if (item.product_type === 'videocard') {
+        const stockResult = await client.query(
+          `
+          SELECT stock_quantity
+          FROM videocards
+          WHERE id = $1
+          FOR UPDATE
+          `,
+          [item.product_id]
+        );
+
+        if (stockResult.rows.length === 0) {
+          throw new Error(`❌ Товар "${item.product_name}" не знайдено.`);
+        }
+
+        const stockQuantity = Number(stockResult.rows[0].stock_quantity || 0);
+
+        if (stockQuantity <= 0) {
+          throw new Error(
+            `❌ Товар тимчасово відсутній
+
+${item.product_name}
+
+На жаль, цього товару більше немає на складі.
+Можливо його вже придбав інший покупець.`
+          );
+        }
+
+        if (Number(item.quantity) > stockQuantity) {
+          throw new Error(
+            `❌ Недостатньо товару на складі
+
+${item.product_name}
+
+Доступно лише: ${stockQuantity} шт.
+
+Будь ласка, зменште кількість товару та повторіть замовлення.`
+          );
+        }
+      }
+    }
+
     const firstItem = items[0];
 
     const orderResult = await client.query(
@@ -149,7 +259,7 @@ const placeOrderMulti = async (req, res) => {
         customer_phone.trim(),
         delivery_address.trim(),
         payment_method,
-        payment_method === 'card' ? String(card_last4).trim() : null,
+        payment_method === 'card' ? String(card_last4 || '').trim() : null,
         payment_method === 'card' ? card_holder?.trim() || null : null,
         payment_method === 'card' ? 'paid' : 'pending',
       ]
@@ -182,10 +292,12 @@ const placeOrderMulti = async (req, res) => {
 
       if (item.product_type === 'videocard') {
         await client.query(
-          `UPDATE videocards
-           SET stock_quantity = GREATEST(stock_quantity - $1, 0),
-               updated_at = CURRENT_TIMESTAMP
-           WHERE id = $2`,
+          `
+          UPDATE videocards
+          SET stock_quantity = stock_quantity - $1,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE id = $2
+          `,
           [item.quantity, item.product_id]
         );
       }
@@ -200,7 +312,10 @@ const placeOrderMulti = async (req, res) => {
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('placeOrderMulti error:', error);
-    return res.status(500).json({ message: 'Помилка сервера при створенні замовлення' });
+
+    return res.status(400).json({
+      message: error.message || 'Помилка сервера при створенні замовлення',
+    });
   } finally {
     client.release();
   }
