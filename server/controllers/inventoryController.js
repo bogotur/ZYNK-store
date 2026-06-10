@@ -245,10 +245,62 @@ const deleteInventoryItem = async (req, res) => {
   }
 };
 
+const createModel = async (req, res) => {
+  try {
+    const { brand_id, name } = req.body;
+
+    if (!brand_id || !name || !name.trim()) {
+      return res.status(400).json({
+        message: 'Оберіть бренд і введіть назву моделі',
+      });
+    }
+
+    const modelName = name.trim();
+
+    const existing = await pool.query(
+      `
+      SELECT *
+      FROM gpu_models
+      WHERE brand_id = $1
+      AND LOWER(name) = LOWER($2)
+      LIMIT 1
+      `,
+      [brand_id, modelName]
+    );
+
+    if (existing.rows.length > 0) {
+      return res.json({
+        message: 'Така модель вже існує',
+        model: existing.rows[0],
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO gpu_models (brand_id, name)
+      VALUES ($1, $2)
+      RETURNING *
+      `,
+      [brand_id, modelName]
+    );
+
+    return res.status(201).json({
+      message: 'Модель успішно створена',
+      model: result.rows[0],
+    });
+  } catch (error) {
+    console.error('createModel error:', error);
+    return res.status(500).json({
+      message: 'Помилка створення моделі',
+    });
+  }
+};
+
 module.exports = {
   getInventoryItems,
   getInventoryMeta,
   getModelsByBrand,
+  createModel,
   createInventoryItem,
   updateInventoryItem,
   uploadInventoryImage,

@@ -109,6 +109,8 @@ const emptyForm = {
   product_type: 'videocard',
   brand_id: '',
   model_id: '',
+  new_model_name: '',
+  use_custom_model: false,
   vendor_id: '',
   image_url: '',
   memory_capacity: '',
@@ -407,7 +409,12 @@ const AdminInventoryPage = () => {
     setForm((prev) => ({
       ...prev,
       [field]: value,
-      ...(field === 'brand_id' ? { model_id: '' } : {}),
+      ...(field === 'brand_id'
+        ? { model_id: '', new_model_name: '', use_custom_model: false }
+        : {}),
+      ...(field === 'use_custom_model'
+        ? { model_id: '', new_model_name: '' }
+        : {}),
     }));
   };
 
@@ -449,13 +456,53 @@ const AdminInventoryPage = () => {
     try {
       setCreating(true);
 
+      if (!form.brand_id) {
+        alert('Оберіть бренд');
+        return;
+      }
+
+      if (form.use_custom_model && !form.new_model_name.trim()) {
+        alert('Введіть назву нової моделі');
+        return;
+      }
+
+      if (!form.use_custom_model && !form.model_id) {
+        alert('Оберіть модель або додайте нову');
+        return;
+      }
+
+      let finalModelId = form.model_id;
+
+      if (form.use_custom_model) {
+        const modelResponse = await axios.post(
+          `${API_BASE}/admin/inventory/models`,
+          {
+            brand_id: form.brand_id,
+            name: form.new_model_name.trim(),
+          },
+          { headers: authHeaders() }
+        );
+
+        finalModelId = modelResponse.data?.model?.id;
+
+        if (!finalModelId) {
+          throw new Error('Не вдалося створити нову модель');
+        }
+      }
+
       const response = await axios.post(
         `${API_BASE}/admin/inventory`,
         {
           ...form,
+          model_id: finalModelId,
           price: Number(form.price),
           stock_quantity: Number(form.stock_quantity || 0),
-          core_clock_ghz: form.product_type === 'videocard' || form.product_type === 'cpu' ? (form.core_clock_ghz ? Number(form.core_clock_ghz) : null) : form.core_clock_ghz,
+          core_clock_ghz:
+            form.product_type === 'videocard' || form.product_type === 'cpu'
+              ? form.core_clock_ghz
+                ? Number(form.core_clock_ghz)
+                : null
+              : form.core_clock_ghz,
         },
         { headers: authHeaders() }
       );
@@ -469,7 +516,7 @@ const AdminInventoryPage = () => {
         setShowCreateForm(false);
       }
     } catch (error) {
-      alert(error?.response?.data?.message || 'Не вдалося додати товар');
+      alert(error?.response?.data?.message || error.message || 'Не вдалося додати товар');
     } finally {
       setCreating(false);
     }
@@ -578,18 +625,45 @@ const AdminInventoryPage = () => {
                 ))}
               </select>
 
-              <select
-                value={form.model_id}
-                onChange={(e) => handleFormChange('model_id', e.target.value)}
-                className="h-14 rounded-[18px] border border-black/10 bg-[#f6f6f6] px-4 text-sm font-medium text-black outline-none"
-              >
-                <option value="">Оберіть модель</option>
-                {models.map((model) => (
-                  <option key={model.id} value={model.id}>
-                    {model.name}
+              <div className="space-y-3">
+                <select
+                  value={form.use_custom_model ? 'custom' : form.model_id}
+                  onChange={(e) => {
+                    if (e.target.value === 'custom') {
+                      handleFormChange('use_custom_model', true);
+                    } else {
+                      setForm((prev) => ({
+                        ...prev,
+                        use_custom_model: false,
+                        new_model_name: '',
+                        model_id: e.target.value,
+                      }));
+                    }
+                  }}
+                  disabled={!form.brand_id}
+                  className="h-14 w-full rounded-[18px] border border-black/10 bg-[#f6f6f6] px-4 text-sm font-medium text-black outline-none disabled:opacity-50"
+                >
+                  <option value="">
+                    {form.brand_id ? 'Оберіть модель' : 'Спочатку оберіть бренд'}
                   </option>
-                ))}
-              </select>
+                  {models.map((model) => (
+                    <option key={model.id} value={model.id}>
+                      {model.name}
+                    </option>
+                  ))}
+                  <option value="custom">+ Додати нову модель</option>
+                </select>
+
+                {form.use_custom_model && (
+                  <input
+                    type="text"
+                    placeholder="Назва нової моделі, напр. RTX 4070 SUPER"
+                    value={form.new_model_name}
+                    onChange={(e) => handleFormChange('new_model_name', e.target.value)}
+                    className="h-14 w-full rounded-[18px] border border-black/10 bg-[#f6f6f6] px-4 text-sm font-medium text-black outline-none"
+                  />
+                )}
+              </div>
 
               <select
                 value={form.vendor_id}
