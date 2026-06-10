@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 const CartContext = createContext(null);
 
@@ -28,10 +34,7 @@ const normalizeCartItem = (item) => {
     image_url: item.image_url || '',
     price: Number(item.price || 0),
     stock_quantity: stockQuantity,
-    quantity: Math.max(
-      1,
-      Math.min(Number(item.quantity || 1), stockQuantity || 1)
-    ),
+    quantity: Math.max(1, Math.min(Number(item.quantity || 1), stockQuantity || 1)),
     memory_capacity: item.memory_capacity || '',
     memory_type: item.memory_type || '',
     interface_type: item.interface_type || '',
@@ -50,6 +53,15 @@ export const CartProvider = ({ children }) => {
   });
 
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartMessage, setCartMessage] = useState('');
+
+  const showCartMessage = (message) => {
+    setCartMessage(message);
+
+    setTimeout(() => {
+      setCartMessage('');
+    }, 3500);
+  };
 
   useEffect(() => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
@@ -61,7 +73,9 @@ export const CartProvider = ({ children }) => {
     if (!nextItem.id) return;
 
     if (nextItem.stock_quantity <= 0) {
-      alert('Цього товару немає в наявності.');
+      showCartMessage(
+        `❌ Товар тимчасово відсутній\n\n${nextItem.brand_name} ${nextItem.model_name}\n\nНа жаль, цього товару зараз немає на складі.`
+      );
       return;
     }
 
@@ -83,19 +97,22 @@ export const CartProvider = ({ children }) => {
               stock_quantity: nextItem.stock_quantity || cartItem.stock_quantity,
             });
 
-            const nextQuantity = Math.min(
-              Number(cartItem.quantity || 1) + 1,
-              maxQuantity
-            );
-
             if (Number(cartItem.quantity || 1) >= maxQuantity) {
-              alert(`На складі доступно лише ${maxQuantity} шт.`);
+              showCartMessage(
+                `❌ Недостатньо товару на складі\n\n${cartItem.brand_name} ${cartItem.model_name}\n\nДоступно лише: ${maxQuantity} шт.`
+              );
+
+              return {
+                ...cartItem,
+                stock_quantity: maxQuantity,
+                quantity: maxQuantity,
+              };
             }
 
             return {
               ...cartItem,
               stock_quantity: maxQuantity,
-              quantity: nextQuantity,
+              quantity: Number(cartItem.quantity || 1) + 1,
             };
           }
 
@@ -124,18 +141,15 @@ export const CartProvider = ({ children }) => {
           const maxQuantity = getStockQuantity(item);
           const requestedQuantity = Number(quantity || 1);
 
-          const safeQuantity = Math.max(
-            1,
-            Math.min(requestedQuantity, maxQuantity || 1)
-          );
-
           if (requestedQuantity > maxQuantity && maxQuantity > 0) {
-            alert(`На складі доступно лише ${maxQuantity} шт.`);
+            showCartMessage(
+              `❌ Недостатньо товару на складі\n\n${item.brand_name} ${item.model_name}\n\nДоступно лише: ${maxQuantity} шт.`
+            );
           }
 
           return {
             ...item,
-            quantity: safeQuantity,
+            quantity: Math.max(1, Math.min(requestedQuantity, maxQuantity || 1)),
           };
         }
 
@@ -171,7 +185,19 @@ export const CartProvider = ({ children }) => {
     clearCart,
   };
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+
+      {cartMessage && (
+        <div className="fixed left-1/2 top-6 z-[9999] w-[92%] max-w-md -translate-x-1/2 rounded-[24px] border border-black/10 bg-white p-5 text-center shadow-[0_20px_60px_rgba(0,0,0,0.25)]">
+          <p className="whitespace-pre-line text-sm font-bold leading-6 text-red-600">
+            {cartMessage}
+          </p>
+        </div>
+      )}
+    </CartContext.Provider>
+  );
 };
 
 export const useCart = () => {
